@@ -16,12 +16,14 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 const httpServer = http.createServer(app);
 const wsServer = SocketIO(httpServer);
 
-wsServer.on("connection", socket => {
+wsServer.on("connection", (socket) => {
+    socket.onAny((event) => {
+        console.log(`Socket Event: ${event}`);
+    });
     socket.on("enter_room", (roomName, done) => {
-        console.log(roomName);
-        setTimeout(() => {
-            done();
-        }, 3000);
+        socket.join(roomName);
+        done();
+        socket.to(roomName).emit("welcome"); // 방에 있는 모두에게 브로드캐스트
     });
 });
 
