@@ -25,6 +25,13 @@ wsServer.on("connection", (socket) => {
         done();
         socket.to(roomName).emit("welcome"); // 방에 있는 모두에게 브로드캐스트
     });
+    socket.on("disconnecting", () => {
+        socket.rooms.forEach(room => socket.to(room).emit("bye"));
+    });
+    socket.on("new_message", (msg, room, done) => {
+        socket.to(room).emit("new_message", msg);
+        done();
+    });
 });
 
 httpServer.listen(3000, handleListen);
