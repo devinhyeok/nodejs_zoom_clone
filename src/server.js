@@ -20,9 +20,26 @@ const io = new Server(httpServer, {
         credentials: true,
     },
 });
+
 // socket.io admin 패널 설정
 instrument(io, {
     auth: false,
+});
+
+io.on("connection", (socket) => {
+    socket.on("join_room", (roomName) => {
+        socket.join(roomName);
+        socket.to(roomName).emit("welcome");
+    });
+    socket.on("offer", (offer, roomName) => {
+        socket.to(roomName).emit("offer", offer);
+    });
+    socket.on("answer", (answer, roomName) => {
+        socket.to(roomName).emit("answer", answer);
+    });
+    socket.on("ice", (ice, roomName) => {
+        socket.to(roomName).emit("ice", ice);
+    });
 });
 
 const handleListen = () => console.log(`Listening on http://localhost:3000`);
